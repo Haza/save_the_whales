@@ -1,0 +1,10 @@
+name = "Operation: Save theme whales"
+description = "Save the content from the bad guy that blow it up."
+package = "Other"
+core = 7.x
+
+dependencies[] = migrate_d2d
+
+files[] = migrate/node.inc
+files[] = migrate/user.inc
+

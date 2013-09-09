@@ -1,0 +1,87 @@
+<?php
+
+define('SAVE_THE_WHALES_NODE_START', 38283);
+define('SAVE_THE_WHALES_USER_START', 26248);
+
+/**
+ * Implements hook_migrate_api().
+ */
+function save_the_whales_migrate_api() {
+  $api = array(
+    'api' => 2,
+  );
+  return $api;
+}
+
+/**
+ * Implements hook_flush_caches().
+ */
+function save_the_whales_flush_caches() {
+  save_the_whales_register_migrations();
+}
+
+/**
+ * Register all DFR-Actual->DFR-Safe migrations.
+ */
+function save_the_whales_register_migrations() {
+  /**
+   * Each migration being registered takes an array of arguments, some required
+   * and some optional. Start with the common arguments required by all - the
+   * source_connection (connection key, set up in settings.php, pointing to
+   * the Drupal 6 database) and source_version (major version of Drupal).
+   */
+  $common_arguments = array(
+    'source_connection' => 'legacy',
+    'source_version' => 7,
+  );
+
+  // The description and the migration machine name are also required arguments,
+  // which will be unique for each migration you register.
+  $arguments = $common_arguments + array(
+    'description' => t('Migration of users from Dfr actual'),
+    'machine_name' => 'WhaleUser7Migration',
+  );
+
+  Migration::registerMigration('WhaleUser7Migration', $arguments['machine_name'],
+                               $arguments);
+
+  // Node migrations - each has its own class derived from the migrate_d2d class,
+  // specifying its particular field mappings and transformations. source_type
+  // and destination_type are required arguments.
+  $node_arguments = array(
+    array(
+      'class_name' => 'ForumWhalesMigration',
+      'description' => t('Forum migration from DFR-actual'),
+      'machine_name' => 'forum',
+      'source_type' => 'forum',
+      'destination_type' => 'forum',
+    ),
+    array(
+      'class_name' => 'AnnuaireWhalesMigration',
+      'description' => t('Annuaire migration from DFR-actual'),
+      'machine_name' => 'annuaire',
+      'source_type' => 'annuaire',
+      'destination_type' => 'annuaire',
+    ),
+    array(
+      'class_name' => 'OffreWhalesMigration',
+      'description' => t('Offre migration from DFR-actual'),
+      'machine_name' => 'offre',
+      'source_type' => 'offre',
+      'destination_type' => 'offre',
+    ),
+
+  );
+  // Tell the node migrations where the users are coming from, so they can
+  // set up the dependency and resolve DFR-actual->DFR-safe uids.
+  $common_node_arguments = $common_arguments + array(
+    'user_migration' => 'WhaleUser7Migration',
+  );
+  foreach ($node_arguments as $arguments) {
+    $arguments = array_merge_recursive($arguments, $common_node_arguments);
+    Migration::registerMigration($arguments['class_name'], $arguments['machine_name'],
+                                 $arguments);
+  }
+
+}
+
