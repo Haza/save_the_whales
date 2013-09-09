@@ -44,6 +44,7 @@ class ForumWhalesMigration extends SaveTheWhalesNodeMigration {
       'field_workflow_status',
     ));
   }
+
 }
 
 class AnnuaireWhalesMigration extends SaveTheWhalesNodeMigration {

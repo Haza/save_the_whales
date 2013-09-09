@@ -33,6 +33,7 @@ function save_the_whales_register_migrations() {
   $common_arguments = array(
     'source_connection' => 'legacy',
     'source_version' => 7,
+    'group_name' => 'SavingWhales',
   );
 
   // The description and the migration machine name are also required arguments,
